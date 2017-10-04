@@ -8,7 +8,7 @@ using namespace glm;
 
 DigitalCanvas2D my_canvas("This is my digital canvas!", 1024, 768); // Canvas : (-1.0, -1.0) x (1.0, 1.0)
 
-class Shooter
+class Human
 {
 public:
 	vec3 center_;
@@ -35,26 +35,23 @@ public:
 		my_canvas.endTransformation();
 	}
 
-	void drawLeftArm(const float & time, const vec3 & color)
-	{
-		my_canvas.beginTransformation();
-		my_canvas.translate(center_.x, center_.y);
-		my_canvas.rotate(sin(time*5.0) * 30.0);			// animation!
-		my_canvas.translate(0.06, -0.03);
-		my_canvas.scale(0.4, 0.1);
-		my_canvas.drawFilledBox(color, 0.15, 0.18);
-		my_canvas.endTransformation();
-	}
-
 	void drawRightArm(const float & time, const vec3 & color)
 	{
 		my_canvas.beginTransformation();
-		my_canvas.translate(center_.x, center_.y);
-		my_canvas.rotate(sin(time*5.0) * 40.0);			// animation!
-		my_canvas.translate(0.045, -0.039);
+		my_canvas.translate(center_.x + 0.02, center_.y - 0.05);
+		my_canvas.rotate(20);
 		my_canvas.scale(0.4, 0.1);
-		my_canvas.drawFilledBox(color, 0.21, 0.18);
-		my_canvas.translate(0.01, 0.0);
+		my_canvas.drawFilledBox(color, 0.2, 0.18);
+		my_canvas.endTransformation();
+	}
+
+	void drawLeftArm(const float & time, const vec3 & color)
+	{
+		my_canvas.beginTransformation();
+		my_canvas.translate(center_.x + 0.02, center_.y - 0.065);
+		my_canvas.scale(0.4, 0.1);
+		my_canvas.drawFilledBox(color, 0.2, 0.18);
+		my_canvas.translate(0.05, -0.06);
 		drawSword(time, RGBColors::red);
 		my_canvas.endTransformation();
 	}
@@ -100,7 +97,7 @@ public:
 	}
 };
 
-class MyTank: public Shooter
+class MyTank: public Human
 {
 public:
 	void draw()
@@ -116,15 +113,62 @@ public:
 	}
 };
 
-class MyCharacter : public Shooter
+class MyWarrior : public Human
 {
 public:
+	void drawRightArm(const float & time, const vec3 & color)
+	{
+		my_canvas.beginTransformation();
+		my_canvas.translate(center_.x + 0.02, center_.y - 0.05);
+		my_canvas.rotate(20);
+		my_canvas.scale(0.4, 0.1);
+		my_canvas.drawFilledBox(color, 0.2, 0.18);
+		my_canvas.endTransformation();
+	}
+
+	void drawLeftArm(const float & time, const vec3 & color)
+	{
+		my_canvas.beginTransformation();
+		my_canvas.translate(center_.x + 0.02, center_.y - 0.065);
+		my_canvas.scale(0.4, 0.1);
+		my_canvas.drawFilledBox(color, 0.2, 0.18);
+		my_canvas.translate(0.05, -0.06);
+		drawSword(time, RGBColors::red);
+		my_canvas.endTransformation();
+	}
+
+	// ¿À¸¥¼Õ ½ºÀ®
+	void actionRight_1(const float & time, const vec3 & color)
+	{
+		my_canvas.beginTransformation();
+		my_canvas.translate(center_.x, center_.y);
+		my_canvas.rotate(sin(time*5.0) * 50.0);			// animation!
+		my_canvas.translate(0.04, -0.03);
+		my_canvas.scale(0.4, 0.1);
+		my_canvas.drawFilledBox(color, 0.18, 0.18);
+		my_canvas.endTransformation();
+	}
+
+	// ¿Þ¼Õ ½ºÀ®
+	void actionLeft_1(const float & time, const vec3 & color)
+	{
+		my_canvas.beginTransformation();
+		my_canvas.translate(center_.x, center_.y);
+		my_canvas.rotate(sin(time*5.0) * 60.0);			// animation!
+		my_canvas.translate(0.03, -0.039);
+		my_canvas.scale(0.4, 0.1);
+		my_canvas.drawFilledBox(color, 0.18, 0.18);
+		my_canvas.translate(0.02, 0.0);
+		drawSword(time, RGBColors::red);
+		my_canvas.endTransformation();
+	}
+
 	void draw(const float& time)
 	{
 		drawHead(RGBColors::black);
 		drawBody(RGBColors::black);
-		drawLeftArm(time, RGBColors::black);
-		drawRightArm(time, RGBColors::black);
+		if (my_canvas.isKeyPressed(GLFW_KEY_R)) actionLeft_1(time, RGBColors::black); else drawLeftArm(time, RGBColors::black);
+		if (my_canvas.isKeyPressed(GLFW_KEY_R)) actionRight_1(time, RGBColors::black); else drawRightArm(time, RGBColors::black);
 		drawLeftLeg(time, RGBColors::black);
 		drawRightLeg(time, RGBColors::black);
 	}
@@ -167,7 +211,7 @@ int main(void)
 	float time = 0.0;
 
 	MyTank tank;
-	MyCharacter warrior;
+	MyWarrior warrior;
 	MyBullet *bullet = nullptr;
 	MyRaser *raser = nullptr;
 
