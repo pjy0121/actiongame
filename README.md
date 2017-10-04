@@ -1,2 +1,2 @@
 # actiongame
-Making an action game using c++(assignment of intensified programming)
+Making an action game using c++(Assignment of Intensified Programming Class)
