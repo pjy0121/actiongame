@@ -91,6 +91,33 @@ public:
 		}
 	}
 
+	void drawPlayer()
+	{
+		my_canvas.beginTransformation();
+		my_canvas.translate(center_.x, center_.y + 0.2);
+		my_canvas.scale(1.0, -1.0);
+		my_canvas.drawFilledTriangle(RGBColors::green, 0.1, 0.1);
+
+		if (player_)
+		{
+			my_canvas.translate(0.0, -0.01);
+			my_canvas.drawFilledBox(RGBColors::black, 0.01, 0.05);
+		}
+		else
+		{
+			my_canvas.drawFilledBox(RGBColors::black, 0.035, 0.01);
+			my_canvas.translate(0.0, -0.02);
+			my_canvas.drawFilledBox(RGBColors::black, 0.035, 0.01);
+			my_canvas.translate(0.0, -0.02);
+			my_canvas.drawFilledBox(RGBColors::black, 0.035, 0.01);
+			my_canvas.translate(-0.015, 0.01);
+			my_canvas.drawFilledBox(RGBColors::black, 0.01, 0.03);
+			my_canvas.translate(0.03, 0.02);
+			my_canvas.drawFilledBox(RGBColors::black, 0.01, 0.03);
+		}
+		my_canvas.endTransformation();
+	}
+
 	void drawHead(const vec3& color)
 	{
 		my_canvas.beginTransformation();
@@ -123,14 +150,7 @@ public:
 		my_canvas.scale(0.4, 0.1);
 		my_canvas.drawFilledBox(color, 0.2, 0.18);
 		my_canvas.translate(0.05, -0.06);
-		drawSword(time, RGBColors::red);
 		my_canvas.endTransformation();
-	}
-
-	void drawSword(const float & time, const vec3 & color)
-	{
-		my_canvas.translate(0.045, 0.8);
-		my_canvas.drawFilledBox(color, 0.05, 1.6);
 	}
 
 	void drawLeftLeg(const float & time, const vec3 & color)
@@ -236,6 +256,16 @@ public:
 		my_canvas.endTransformation();
 	}
 
+	void drawSword(const float & time, const vec3 & color)
+	{
+		my_canvas.translate(0.045, 0.8);
+		my_canvas.drawFilledBox(color, 0.05, 1.6);
+		my_canvas.translate(0.0, 0.95);
+		my_canvas.drawFilledTriangle(color, 0.05, 0.3);
+		my_canvas.translate(0.0, -1.3);
+		my_canvas.drawFilledBox(color, 0.1, 0.2);
+	}
+
 	// ¿À¸¥¼Õ ½ºÀ®
 	void actionRight_1(const float & time, const vec3 & color)
 	{
@@ -268,6 +298,7 @@ public:
 		{
 			my_canvas.scale(-1.0, 1.0);
 		}
+		drawPlayer();
 		drawHead(RGBColors::black);
 		drawBody(RGBColors::black);
 		if (player_)
@@ -303,8 +334,8 @@ public:
 	void drawRightArm(const float & time, const vec3 & color)
 	{
 		my_canvas.beginTransformation();
-		my_canvas.translate(center_.x + 0.02, center_.y - 0.05);
-		my_canvas.rotate(20);
+		my_canvas.translate(center_.x + 0.04, center_.y - 0.05);
+		my_canvas.rotate(-15);
 		my_canvas.scale(0.4, 0.1);
 		my_canvas.drawFilledBox(color, 0.2, 0.18);
 		my_canvas.endTransformation();
@@ -317,8 +348,20 @@ public:
 		my_canvas.scale(0.4, 0.1);
 		my_canvas.drawFilledBox(color, 0.2, 0.18);
 		my_canvas.translate(0.05, -0.06);
-		drawSword(time, RGBColors::red);
+		drawGun(time, RGBColors::blue);
 		my_canvas.endTransformation();
+	}
+
+	void drawGun(const float & time, const vec3 & color)
+	{
+		my_canvas.translate(0.075, 0.1);
+		my_canvas.drawFilledBox(color, 0.05, 0.4);
+		my_canvas.translate(-0.08, 0.0);
+		my_canvas.drawFilledBox(color, 0.05, 0.4);
+		my_canvas.translate(0.2, 0.1);
+		my_canvas.drawFilledBox(color, 0.3, 0.15);
+		my_canvas.translate(-0.1, -0.05);
+		my_canvas.drawFilledBox(color, 0.3, 0.15);
 	}
 
 	// ¿À¸¥¼Õ ½ºÀ®
@@ -343,7 +386,7 @@ public:
 		my_canvas.scale(0.4, 0.1);
 		my_canvas.drawFilledBox(color, 0.18, 0.18);
 		my_canvas.translate(0.02, 0.0);
-		drawSword(time, RGBColors::red);
+		drawGun(time, RGBColors::blue);
 		my_canvas.endTransformation();
 	}
 
@@ -353,6 +396,7 @@ public:
 		{
 			my_canvas.scale(-1.0, 1.0);
 		}
+		drawPlayer();
 		drawHead(RGBColors::black);
 		drawBody(RGBColors::black);
 		if (player_)

@@ -122,6 +122,20 @@ public:
 		glEnd();
 	}
 
+	// 삼각형 그리기
+	void drawFilledTriangle(const glm::vec3& color, const float& width, const float& height)
+	{
+		const glm::vec2 left_bottom(-0.5*width, -0.5*height);
+
+		glColor3fv(&color[0]);
+		glBegin(GL_TRIANGLES);
+		{
+			glVertex2f(left_bottom.x, left_bottom.y);
+			glVertex2f(left_bottom.x + width, left_bottom.y);
+			glVertex2f(left_bottom.x + width/2, left_bottom.y + height);
+		}
+		glEnd();
+	}
 	void drawFilledCircle(const glm::vec3& color, const float& radius, const int& num_segments = 100)
 	{
 		const float d_theta = glm::half_pi<float>() * 4.0 / (float)num_segments;
