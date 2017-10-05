@@ -54,30 +54,11 @@ public:
 		if (player_)
 		{
 			// move left & right side
-			if (my_canvas.isKeyPressed(GLFW_KEY_LEFT)) {
-				center_.x -= 0.0004;
-			}
-			if (my_canvas.isKeyPressed(GLFW_KEY_RIGHT)) {
-				center_.x += 0.0004;
-			}
-
-			// move up & down
-			if (my_canvas.isKeyPressed(GLFW_KEY_UP)) {
-				center_.y += 0.0004;
-			}
-			if (my_canvas.isKeyPressed(GLFW_KEY_DOWN)) {
-				center_.y -= 0.0004;
-			}
-			return P1;
-		}
-		else
-		{
-			// move left & right side
 			if (my_canvas.isKeyPressed(GLFW_KEY_A)) {
-				center_.x += 0.0004;
+				center_.x -= 0.0004;
 			}
 			if (my_canvas.isKeyPressed(GLFW_KEY_D)) {
-				center_.x -= 0.0004;
+				center_.x += 0.0004;
 			}
 
 			// move up & down
@@ -85,6 +66,25 @@ public:
 				center_.y += 0.0004;
 			}
 			if (my_canvas.isKeyPressed(GLFW_KEY_S)) {
+				center_.y -= 0.0004;
+			}
+			return P1;
+		}
+		else
+		{
+			// move left & right side
+			if (my_canvas.isKeyPressed(GLFW_KEY_LEFT)) {
+				center_.x += 0.0004;
+			}
+			if (my_canvas.isKeyPressed(GLFW_KEY_RIGHT)) {
+				center_.x -= 0.0004;
+			}
+
+			// move up & down
+			if (my_canvas.isKeyPressed(GLFW_KEY_UP)) {
+				center_.y += 0.0004;
+			}
+			if (my_canvas.isKeyPressed(GLFW_KEY_DOWN)) {
 				center_.y -= 0.0004;
 			}
 			return P2;
@@ -272,13 +272,13 @@ public:
 		drawBody(RGBColors::black);
 		if (player_)
 		{
-			if (my_canvas.isKeyPressed(GLFW_KEY_K)) actionLeft_1(time, RGBColors::black); else drawLeftArm(time, RGBColors::black);
-			if (my_canvas.isKeyPressed(GLFW_KEY_K)) actionRight_1(time, RGBColors::black); else drawRightArm(time, RGBColors::black);
+			if (my_canvas.isKeyPressed(GLFW_KEY_R)) actionLeft_1(time, RGBColors::black); else drawLeftArm(time, RGBColors::black);
+			if (my_canvas.isKeyPressed(GLFW_KEY_R)) actionRight_1(time, RGBColors::black); else drawRightArm(time, RGBColors::black);
 		}
 		else
 		{
-			if (my_canvas.isKeyPressed(GLFW_KEY_R)) actionLeft_1(time, RGBColors::black); else drawLeftArm(time, RGBColors::black);
-			if (my_canvas.isKeyPressed(GLFW_KEY_R)) actionRight_1(time, RGBColors::black); else drawRightArm(time, RGBColors::black);
+			if (my_canvas.isKeyPressed(GLFW_KEY_K)) actionLeft_1(time, RGBColors::black); else drawLeftArm(time, RGBColors::black);
+			if (my_canvas.isKeyPressed(GLFW_KEY_K)) actionRight_1(time, RGBColors::black); else drawRightArm(time, RGBColors::black);
 		}
 		drawLeftLeg(time, RGBColors::black);
 		drawRightLeg(time, RGBColors::black);
@@ -357,13 +357,13 @@ public:
 		drawBody(RGBColors::black);
 		if (player_)
 		{
-			if (my_canvas.isKeyPressed(GLFW_KEY_K)) actionLeft_1(time, RGBColors::black); else drawLeftArm(time, RGBColors::black);
-			if (my_canvas.isKeyPressed(GLFW_KEY_K)) actionRight_1(time, RGBColors::black); else drawRightArm(time, RGBColors::black);
+			if (my_canvas.isKeyPressed(GLFW_KEY_R)) actionLeft_1(time, RGBColors::black); else drawLeftArm(time, RGBColors::black);
+			if (my_canvas.isKeyPressed(GLFW_KEY_R)) actionRight_1(time, RGBColors::black); else drawRightArm(time, RGBColors::black);
 		}
 		else
 		{
-			if (my_canvas.isKeyPressed(GLFW_KEY_R)) actionLeft_1(time, RGBColors::black); else drawLeftArm(time, RGBColors::black);
-			if (my_canvas.isKeyPressed(GLFW_KEY_R)) actionRight_1(time, RGBColors::black); else drawRightArm(time, RGBColors::black);
+			if (my_canvas.isKeyPressed(GLFW_KEY_K)) actionLeft_1(time, RGBColors::black); else drawLeftArm(time, RGBColors::black);
+			if (my_canvas.isKeyPressed(GLFW_KEY_K)) actionRight_1(time, RGBColors::black); else drawRightArm(time, RGBColors::black);
 		}
 		drawLeftLeg(time, RGBColors::black);
 		drawRightLeg(time, RGBColors::black);
