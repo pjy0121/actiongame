@@ -13,11 +13,13 @@ DigitalCanvas2D my_canvas("This is my digital canvas!", 1024, 768); // Canvas : 
 int is_attacked(vec3& a, vec3& b, vec3* attackedPos);
 int is_attacked(vec3& a, vec3& b);
 int is_close(vec3& a, vec3& b);
+void menu();
+void guide();
 
 class Human
 {
 public:
-	int defense_;
+	bool defense_;
 	double hp_;
 	double speed_;
 	bool player_;
@@ -28,7 +30,7 @@ public:
 	
 
 	// 생성자
-	Human() : hp_(100), defense_(10), speed_(0.0006), dead_(false)
+	Human() : hp_(100), defense_(false), speed_(0.0006), dead_(false)
 	{}
 
 	// 게임 시작 시 초기 위치 지정
@@ -73,6 +75,11 @@ public:
 			if (my_canvas.isKeyPressed(GLFW_KEY_S)) {
 				center_.y -= speed_;
 			}
+
+			if (my_canvas.isKeyPressed(GLFW_KEY_CAPS_LOCK))
+				defense_ = true;
+			else defense_ = false;
+
 			return true;
 		}
 		else		// 2P 키셋팅
@@ -92,6 +99,11 @@ public:
 			if (my_canvas.isKeyPressed(GLFW_KEY_DOWN)) {
 				center_.y -= speed_;
 			}
+
+			if (my_canvas.isKeyPressed(GLFW_KEY_ENTER))
+				defense_ = true;
+			else defense_ = false;
+			
 			return true;
 		}
 	}
@@ -99,8 +111,8 @@ public:
 	// 피격 시 뒤로 밀림(넉백)
 	void knockback()
 	{
-		center_.x -= 0.003;
-		center_.y -= 0.003;
+		center_.x -= 0.002;
+		center_.y -= 0.002;
 	}
 
 	// 승자의 표식으로 왕관을 씌워줌
@@ -119,6 +131,47 @@ public:
 		my_canvas.drawFilledTriangle(RGBColors::yellow, 0.04, 0.02);
 		my_canvas.rotate(-90);
 		my_canvas.endTransformation();
+
+		drawOver();
+	}
+
+	// 끝 그리기 + 게임 끝난 후 자동종료
+	void drawOver()
+	{
+		static float timer = 0.0;	// 종료 타이머 - 이 함수 실행 후 약 3초 후 종료
+		// ㄲ
+		my_canvas.beginTransformation();
+		my_canvas.translate(-0.4, 0.8);
+		my_canvas.drawFilledBox(RGBColors::black, 0.35, 0.075);
+		my_canvas.translate(0.45, 0.0);
+		my_canvas.drawFilledBox(RGBColors::black, 0.35, 0.075);
+		my_canvas.translate(-0.35, -0.25);
+		my_canvas.drawFilledBox(RGBColors::black, 0.05, 0.3);
+		my_canvas.translate(0.45, 0.0);
+		my_canvas.drawFilledBox(RGBColors::black, 0.05, 0.3);
+		
+		// ㅡ
+		my_canvas.translate(-0.15, -0.4);
+		my_canvas.drawFilledBox(RGBColors::black, 1.6, 0.05);
+
+		// ㅌ
+		my_canvas.translate(0.0, -0.4);
+		my_canvas.drawFilledBox(RGBColors::black, 0.5, 0.05);
+		my_canvas.translate(0.0, -0.3);
+		my_canvas.drawFilledBox(RGBColors::black, 0.5, 0.05);
+		my_canvas.translate(0.0, -0.3);
+		my_canvas.drawFilledBox(RGBColors::black, 0.5, 0.05);
+		my_canvas.translate(-0.2, 0.125);
+		my_canvas.drawFilledBox(RGBColors::black, 0.05, 0.25);
+		my_canvas.translate(0.0, 0.35);
+		my_canvas.drawFilledBox(RGBColors::black, 0.05, 0.25);
+
+		my_canvas.endTransformation();
+
+		timer += 1.0;
+
+		if (timer >= 3000)
+			exit(0);
 	}
 
 	// hp바 그리기
@@ -236,12 +289,14 @@ public:
 	void drawLeftLeg(const float & time, const vec3 & color)
 	{
 		my_canvas.beginTransformation();
-		my_canvas.translate(center_.x-0.01, center_.y-0.13);
-		my_canvas.drawFilledBox(RGBColors::black, 0.018, 0.03);
+		my_canvas.translate(center_.x-0.01, center_.y-0.12);
+		my_canvas.rotate(-30 + sin(time*7.0) * 60);
+		my_canvas.drawFilledBox(RGBColors::black, 0.021, 0.03);
 		my_canvas.translate(0.0, -0.02);
-		my_canvas.rotate(20 * sqrt(sin(time * 60) + 1));
-		my_canvas.drawFilledBox(RGBColors::black, 0.015, 0.02);
+		my_canvas.drawFilledBox(RGBColors::black, 0.015, 0.07);
 		my_canvas.translate(0.0, -0.01);
+		my_canvas.drawFilledBox(RGBColors::black, 0.02, 0.01);
+		my_canvas.translate(0.005, -0.02);
 		my_canvas.drawFilledBox(RGBColors::black, 0.02, 0.01);
 		my_canvas.endTransformation();
 	}
@@ -249,12 +304,14 @@ public:
 	void drawRightLeg(const float & time, const vec3 & color)
 	{
 		my_canvas.beginTransformation();
-		my_canvas.translate(center_.x + 0.01, center_.y - 0.13);
-		my_canvas.drawFilledBox(RGBColors::black, 0.018, 0.03);
+		my_canvas.translate(center_.x + 0.01, center_.y - 0.12);
+		my_canvas.rotate(-30 + sin(time*7.0) * -60);
+		my_canvas.drawFilledBox(RGBColors::black, 0.021, 0.03);
 		my_canvas.translate(0.0, -0.02);
-		my_canvas.rotate(20*sqrt(sin(time*60)+1));
-		my_canvas.drawFilledBox(RGBColors::black, 0.015, 0.02);
+		my_canvas.drawFilledBox(RGBColors::black, 0.015, 0.07);
 		my_canvas.translate(0.0, -0.01);
+		my_canvas.drawFilledBox(RGBColors::black, 0.02, 0.01);
+		my_canvas.translate(0.005, -0.02);
 		my_canvas.drawFilledBox(RGBColors::black, 0.02, 0.01);
 		my_canvas.endTransformation();
 	}
@@ -289,7 +346,6 @@ public:
 	MyWarrior(bool _player) : dash_(true)
 	{
 		player_ = _player;
-		defense_ = 20;
 		speed_ = 0.0009;
 		swordPos_ = center_;
 		
@@ -473,9 +529,10 @@ public:
 		my_canvas.beginTransformation();
 		my_canvas.translate(center_.x + 0.04, center_.y - 0.05);
 		my_canvas.drawFilledBox(color, 0.09, 0.02);
-		my_canvas.translate(0.02, 0.01);
+		my_canvas.translate(0.0, 0.01);
 		my_canvas.rotate(-90);
 		my_canvas.scale(0.4, 0.1);
+		my_canvas.translate(0.0, 0.3);
 		drawSword(time, RGBColors::red);
 		my_canvas.rotate(90);
 		my_canvas.endTransformation();
@@ -756,25 +813,25 @@ int main(void)
 {
 	float time = 0.0;
 
-	MyWarrior warrior(P2);
-	MyGunner gunner(P1);
+	MyWarrior warrior(P1);
+	MyGunner gunner(P2);
 	MyBullet *bullet = nullptr;
 
 	/*
 	int bg = 0;	// 배경 번호
 	cout << "배경을 설정해주세요. (1) 숲 (2) 바다 (3) 땅\n --> " << endl;
 	cin >> bg;
+	*/
 
 	int select = 0;
-	cout << "캐릭터를 선택해주세요." << endl;
-	cout << "(1) 워리어(1P) vs 거너(2P) (2) 거너(1P) vs 워리어(2P)\n --> " << endl;
+	menu();
 	cin >> select;
 
 	if (select == 2)	// 2번을 선택 시 warrior가 2P, gunner가 1P
 	{
 		warrior.player_ = false; gunner.player_ = true;
 	}
-	*/
+	
 	my_canvas.show([&]
 	{
 	/*
@@ -785,20 +842,11 @@ int main(void)
 		my_canvas.translate(0.83, 0.5);
 		my_canvas.endTransformation();
 	*/
-
-		for (int i = -10; i < 10; i++)
-		{
-			my_canvas.beginTransformation();
-			my_canvas.translate(0.0 + 0.1*i, 0.0);
-			my_canvas.drawFilledCircle(RGBColors::green, 0.01, 30);
-			my_canvas.endTransformation();
-		}
-
 		warrior.keySettings();	// 키셋팅
 		gunner.keySettings();	// 키셋팅
 		
 		// shoot a bullet
-		if ((gunner.player_ && my_canvas.isKeyPressed(GLFW_KEY_T)) || (!gunner.player_ && my_canvas.isKeyPressed(GLFW_KEY_K)))
+		if ((gunner.player_ && my_canvas.isKeyPressed(GLFW_KEY_R)) || (!gunner.player_ && my_canvas.isKeyPressed(GLFW_KEY_K)))
 		{
 			vec3 gp = gunner.gunPos_;
 			vec3 wc = warrior.center_;
@@ -807,14 +855,16 @@ int main(void)
 			else gp.x = -gp.x;
 			if (is_close(gp, wc) && !gunner.dead_)	// 워리어와 근거리에 위치할 경우
 			{
+				double shot_damage = 0.1;
+				if (warrior.defense_)	// 방어 모드
+					shot_damage *= 0.2;
 				if (bullet != nullptr) { vec3 bc = bullet->center_; warrior.bleeding(bc, time); }	// 피 흘리는 모션
 				gunner.close_shot();	// 근거리 공격 후
-				warrior.hp_ -= 0.01;	// 워리어는 데미지를 입음
+				warrior.hp_ -= shot_damage;	// 워리어는 데미지를 입음
 				printf("워리어 피격! - HP : %lf\n", warrior.hp_);
 				warrior.knockback();	// 워리어 넉백
 				gunner.knockback();	// 뒤로 물러섬
 			}
-
 			else
 			{
 				for (int i = 0; i < 3; i++)
@@ -857,8 +907,10 @@ int main(void)
 			if (is_attacked(wc, bullet->center_, attackedPos))
 			{
 				vec3 bc = bullet->center_;
+				double bullet_damage = 20.0;
 				bullet = nullptr;	// 맞으면 총알이 사라짐
-				warrior.hp_ -= 20.0;	// hp감소
+				if (warrior.defense_) bullet_damage *= 0.2;	// 방어 모드 
+				warrior.hp_ -= bullet_damage;	// hp감소
 
 				printf("워리어 피격! - HP : %lf\n", warrior.hp_);
 				warrior.knockback();
@@ -876,10 +928,16 @@ int main(void)
 
 		if (is_attacked(sp, gc))
 		{
+			double swing_damage = 0.5, pierce_damage = 0.1;
 			// hp감소
+			if (gunner.defense_)	// 방어 모드
+			{
+				swing_damage *= 0.2;
+				pierce_damage *= 0.2;
+			}
 			if ((my_canvas.isKeyPressed(GLFW_KEY_T) && warrior.player_)|| (my_canvas.isKeyPressed(GLFW_KEY_L) && !warrior.player_))	// 찌르기일 경우
-				gunner.hp_ -= 0.1;
-			else gunner.hp_ -= 0.5;	// 스윙(베기) 일 경우
+				gunner.hp_ -= pierce_damage;
+			else gunner.hp_ -= swing_damage;	// 스윙(베기) 일 경우
 			printf("거너 피격! - HP : %lf\n", gunner.hp_);
 			gunner.bleeding(sp, time);	// 피를 흘리는 모션
 		}
@@ -893,6 +951,56 @@ int main(void)
 	}
 	);
 	return 0;
+}
+
+void menu()
+{
+	int menu_select = 0;
+	cout << "(1) 게임 시작하기\t (2) 게임 가이드 보기" << endl;
+	cout << ": ";
+	cin >> menu_select;
+	cout << "\n" << endl;
+
+	if (menu_select == 2)
+	{
+		guide();
+	}
+	
+	cout << "\n\n\n\n\n- 게임 시작 -\n" << endl;
+	cout << "캐릭터 구성을 선택해주세요." << endl;
+	cout << "(1) \t\t (2)" << endl;
+	cout << "1P - 워리어 \t 1P - 거너" << endl;
+	cout << "2P - 거너 \t 2P - 워리어" << endl;
+	cout << ": ";
+}
+
+void guide()
+{
+	cout << "이 게임은 2인이 하나의 키보드를 가지고 플레이하는 대전게임입니다." << endl;
+	cout << "각 플레이어는 워리어 / 거너 중 하나의 캐릭터로 플레이하게 됩니다." << endl;
+	cout << "먼저 상대방의 HP 게이지를 없애는 플레이어가 승리합니다.\n\n" << endl;
+	
+	cout << "<캐릭터 조작>" << endl;
+	cout << "● 1P의 키셋팅 \t| ○ 2P의 키셋팅" << endl;
+	cout << "ㅁ 방향키 : " << endl ;
+	cout << "  w\t\t|  ↑" << endl;
+	cout << "a s d  \t\t|←↓→\n" << endl;
+	cout << "ㅁ 공격1 :\n  R\t\t| K" << endl;
+	cout << "ㅁ 공격2 :\n  T\t\t| L\n" << endl;
+	cout << "ㅁ 방어 : \n  CapsLock\t| Enter\n" << endl;
+	cout << "ㅁ 특수 스킬 :\n  Left-Shift\t| Right-Shift\n\n" << endl;
+
+	cout << "<기술>" << endl;
+	cout << "ㅁ 워리어의 공격1 - 베기 : 칼을 위아래로 빠르게 휘두릅니다." << endl;
+	cout << "ㅁ 워리어의 공격2 - 찌르기 : 칼을 창처럼 쥐고 돌진하여 찌릅니다.\n" << endl;
+	cout << "ㅁ 거너의 공격1\n- 총알 발사(원거리) : 매우 빠른 총알 1발을 발사합니다." << 
+		"\n- 밀어내기(근거리) : 적에게 데미지를 줌과 동시에 적과 자신을 약간 이격시킵니다." << endl;
+	cout << "ㅁ 거너의 공격2 - 없음\n" << endl;
+	cout << "ㅁ 방어(공통) : 방어 중에는 적의 공격에 20%의 데미지만을 입습니다.\n" << endl;
+
+	cout << "캐릭터 위에 구슬이 돌고 있다면 특수 스킬 발동이 가능합니다." << endl;
+	cout << "ㅁ 워리어의 특수 스킬(쿨타임 5초)\n- 대쉬(Dash) : 방향키와 함께 사용하여 해당 방향으로 빠르게 이동합니다." << endl;
+	cout << "ㅁ 거너의 특수 스킬(쿨타임 7초)\n- 페이드어웨이(Fade-away) : 위키 혹은 아래 키와 함께 사용하여 해당 방향 뒤쪽으로 멀리 도망칩니다.\n" << endl;
 }
 
 // 두 점의 좌표가 같은 지 판단하기(피격여부 판단)
@@ -918,7 +1026,7 @@ int is_attacked(vec3& a, vec3& b)
 // 두 점이 가까이 있는지 판단
 int is_close(vec3& a, vec3& b)
 {
-	if (b.x - 0.17 < a.x && a.x < b.x + 0.17 && b.y - 0.1 < a.y && a.y < b.y + 0.1)
+	if (b.x - 0.2 < a.x && a.x < b.x + 0.2 && b.y - 0.1 < a.y && a.y < b.y + 0.1)
 		return 1;
 	else return 0;
 }
