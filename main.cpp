@@ -28,7 +28,7 @@ public:
 	
 
 	// 생성자
-	Human() : hp_(100), defense_(10), speed_(0.0003), dead_(false)
+	Human() : hp_(100), defense_(10), speed_(0.0006), dead_(false)
 	{}
 
 	// 게임 시작 시 초기 위치 지정
@@ -179,6 +179,25 @@ public:
 		my_canvas.endTransformation();
 	}
 
+	// 특수스킬의 활성 여부를 알려주는 공모양 이펙트
+	void special_effect(float& time, const vec3& color)
+	{
+		my_canvas.beginTransformation();
+		if (!player_)
+		{
+			my_canvas.scale(-1.0, 1.0);
+		}
+		my_canvas.translate(center_.x, center_.y + 0.2);
+		my_canvas.rotate(time * 90.0);
+		my_canvas.translate(-0.05, 0.0);
+		my_canvas.drawFilledCircle(color, 0.02, 100);
+		if (!player_)
+		{
+			my_canvas.scale(-1.0, 1.0);
+		}
+		my_canvas.endTransformation();
+	}
+
 	void drawHead(const vec3& color)
 	{
 		my_canvas.beginTransformation();
@@ -259,30 +278,6 @@ public:
 	}
 };
 
-class MyTank: public Human
-{
-public:
-	void draw()
-	{
-		my_canvas.beginTransformation();
-		my_canvas.translate(center_.x, center_.y);
-		my_canvas.drawFilledBox(RGBColors::green, 0.25, 0.1);
-		my_canvas.translate(-0.02, 0.1);
-		my_canvas.drawFilledBox(RGBColors::blue, 0.15, 0.09);
-		my_canvas.translate(0.15, 0.0);
-		my_canvas.drawFilledBox(RGBColors::red, 0.15, 0.03);
-		my_canvas.endTransformation();
-	}
-
-	// 좌우대칭 함수
-	void reverseDraw()
-	{
-		my_canvas.scale(-1.0, 1.0);
-		draw();
-		my_canvas.scale(-1.0, 1.0);
-	}
-};
-
 class MyWarrior : public Human
 {
 public:
@@ -295,7 +290,7 @@ public:
 	{
 		player_ = _player;
 		defense_ = 20;
-		speed_ = 0.0006;
+		speed_ = 0.0009;
 		swordPos_ = center_;
 		
 		initPosition();	// 시작 위치 설정
@@ -341,30 +336,60 @@ public:
 		my_canvas.endTransformation();
 	}
 
-	void dash()
+	// 앞으로 돌진 - 8초마다 한번 쓸 수 있는 워리어의 특수 스킬
+	void dash(float& time)
 	{
-		if (player_)
+		if (dash_)		// dash를 쓸 수 있을 때
 		{
-			if (my_canvas.isKeyPressed(GLFW_KEY_A) && my_canvas.isKeyPressed(GLFW_KEY_LEFT_SHIFT))
-				center_.x -= 1.0;
-			else if (my_canvas.isKeyPressed(GLFW_KEY_D) && my_canvas.isKeyPressed(GLFW_KEY_LEFT_SHIFT))
-				center_.x += 1.0;
-			else if (my_canvas.isKeyPressed(GLFW_KEY_W) && my_canvas.isKeyPressed(GLFW_KEY_LEFT_SHIFT))
-				center_.y += 1.0;
-			else if (my_canvas.isKeyPressed(GLFW_KEY_S) && my_canvas.isKeyPressed(GLFW_KEY_LEFT_SHIFT))
-				center_.y -= 1.0;
-		}
-		else
-		{
-			if (my_canvas.isKeyPressed(GLFW_KEY_LEFT) && my_canvas.isKeyPressed(GLFW_KEY_RIGHT_SHIFT))
-				center_.x -= 0.2;
-			else if (my_canvas.isKeyPressed(GLFW_KEY_RIGHT) && my_canvas.isKeyPressed(GLFW_KEY_RIGHT_SHIFT))
-				center_.x += 0.2;
-			else if (my_canvas.isKeyPressed(GLFW_KEY_UP) && my_canvas.isKeyPressed(GLFW_KEY_RIGHT_SHIFT))
-				center_.y += 0.2;
-			else if (my_canvas.isKeyPressed(GLFW_KEY_DOWN) && my_canvas.isKeyPressed(GLFW_KEY_RIGHT_SHIFT))
-				center_.y -= 0.2;
-		}
+			special_effect(time, RGBColors::red);	// dash가 활성상태인지를 알려주는 공모양 이펙트
+
+			if (player_)	// warrior가 1P일 때
+			{	// dash는 방향키 조작에 따라 방향이 달라짐
+				if (my_canvas.isKeyPressed(GLFW_KEY_A) && my_canvas.isKeyPressed(GLFW_KEY_LEFT_SHIFT))
+				{
+					dash_to(-0.2, 0.0); dash_ = false;
+				}
+				else if (my_canvas.isKeyPressed(GLFW_KEY_D) && my_canvas.isKeyPressed(GLFW_KEY_LEFT_SHIFT))
+				{
+					dash_to(0.2, 0.0); dash_ = false;
+				}
+				else if (my_canvas.isKeyPressed(GLFW_KEY_W) && my_canvas.isKeyPressed(GLFW_KEY_LEFT_SHIFT))
+				{
+					dash_to(0.0, 0.2); dash_ = false;
+				}
+				else if (my_canvas.isKeyPressed(GLFW_KEY_S) && my_canvas.isKeyPressed(GLFW_KEY_LEFT_SHIFT))
+				{
+					dash_to(0.0, -0.2); dash_ = false;
+				}
+			}
+			else	// warrior가 2P일 때
+			{
+				if (my_canvas.isKeyPressed(GLFW_KEY_LEFT) && my_canvas.isKeyPressed(GLFW_KEY_RIGHT_SHIFT))
+				{
+					dash_to(0.2, 0.0); dash_ = false;
+				}
+				else if (my_canvas.isKeyPressed(GLFW_KEY_RIGHT) && my_canvas.isKeyPressed(GLFW_KEY_RIGHT_SHIFT))
+				{
+					dash_to(-0.2, 0.0); dash_ = false;
+				}
+				else if (my_canvas.isKeyPressed(GLFW_KEY_UP) && my_canvas.isKeyPressed(GLFW_KEY_RIGHT_SHIFT))
+				{
+					dash_to(0.0, 0.2); dash_ = false;
+				}
+				else if (my_canvas.isKeyPressed(GLFW_KEY_DOWN) && my_canvas.isKeyPressed(GLFW_KEY_RIGHT_SHIFT))
+				{
+					dash_to(0.0, -0.2); dash_ = false;
+				}
+			}
+		}		// ↓ dash의 쿨타임(재사용 대기 시간)을 5초로 두기 위함
+		else if ((int)time % 8 == 0 && 0 < time - (int)time && time - (int)time < 0.01) dash_ = true;
+	}
+
+	// dash되는 위치
+	void dash_to(double x, double y)
+	{
+		center_.x += x;
+		center_.y += y;
 	}
 
 	void drawRightArm(const float & time, const vec3 & color)
@@ -428,8 +453,8 @@ public:
 
 		double x = center_.x + 0.06;
 		double y = center_.y + 0.12;
-		swordPos_.x = x + pow(0.35*sin(time*7.0+90), 2);	// 스윙할 때 좌표 변화
-		swordPos_.y = y + pow(0.5*sin(time*7.0), 2) - 0.22;
+		swordPos_.x = x + pow(0.35*sin(time*8.0+90), 2);	// 스윙할 때 좌표 변화
+		swordPos_.y = y + pow(0.5*sin(time*8.0), 2) - 0.22;
 		// printf("%lf %lf\n", swordPos_.x, swordPos_.y);
 	}
 
@@ -521,8 +546,9 @@ class MyGunner : public Human
 {
 public:
 	vec3 gunPos_;
+	bool fadeaway_;
 
-	MyGunner(bool _player)
+	MyGunner(bool _player)	:fadeaway_(true)
 	{
 		gunPos_ = center_;
 		player_ = _player;
@@ -604,10 +630,14 @@ public:
 		gunPos_.y = center_.y - 0.05;
 	}
 
-	// 근접 공격 이펙트
+	// 근거리 공격 이펙트
 	void close_shot()
 	{
 		my_canvas.beginTransformation();
+		if (!player_)	// gunner가 2P일 경우
+		{
+			my_canvas.scale(-1.0, 1.0);	// 좌우대칭
+		}
 		my_canvas.translate(gunPos_.x, gunPos_.y);
 		my_canvas.scale(0.4, 0.1);
 		my_canvas.translate(-0.02, 0.0);
@@ -628,39 +658,52 @@ public:
 		my_canvas.translate(0.2, 0.0);
 		my_canvas.drawFilledBox(RGBColors::red, 0.25, 0.05);
 		my_canvas.translate(-0.2, 0.0);
+		if (!player_)	// gunner가 2P일 경우
+		{
+			my_canvas.scale(-1.0, 1.0);	// 좌우대칭
+		}
 		my_canvas.endTransformation();
 	}
 
-	// 특수 스킬 - 뒤로 빠르게 물러서기
-	void fadeaway()
+	// 뒤로 빠르게 물러서기 - 11초마다 한번 쓸 수 있는 gunner의 특수 스킬
+	void fadeaway(float& time)
 	{
-		center_.x -= 0.1;
+		if (fadeaway_)		// fadeaway를 쓸 수 있을 때
+		{
+			special_effect(time, RGBColors::blue);	// fadeaway가 활성상태인지를 알려주는 공모양 이펙트
+			if (player_)	// gunner가 1P일 때
+			{	
+				if(my_canvas.isKeyPressed(GLFW_KEY_LEFT_SHIFT) && my_canvas.isKeyPressed(GLFW_KEY_W))		// 위쪽으로 fadeaway
+				{
+					fade_to(-0.4, 0.4); fadeaway_ = false;
+				}
+
+				if (my_canvas.isKeyPressed(GLFW_KEY_LEFT_SHIFT) && my_canvas.isKeyPressed(GLFW_KEY_S))		// 아래쪽으로 fadeaway
+				{
+					fade_to(-0.4, -0.4); fadeaway_ = false;
+				}
+			}
+			else	// gunner가 2P일 때
+			{
+				if (my_canvas.isKeyPressed(GLFW_KEY_RIGHT_SHIFT) && my_canvas.isKeyPressed(GLFW_KEY_UP))		// 위쪽으로 fadeaway
+				{
+					fade_to(-0.4, 0.4); fadeaway_ = false;
+				}
+
+				if (my_canvas.isKeyPressed(GLFW_KEY_RIGHT_SHIFT) && my_canvas.isKeyPressed(GLFW_KEY_DOWN))		// 아래쪽으로 fadeaway
+				{
+					fade_to(-0.4, -0.4); fadeaway_ = false;
+				}
+			}
+		}		// ↓ fadeaway의 쿨타임(재사용 대기 시간)을 7초로 두기 위함
+		else if ((int)time % 7 == 0 && 0 < time - (int)time && time - (int)time < 0.01) fadeaway_ = true;
 	}
 
-	// 오른손 스윙
-	void actionRight_1(const float & time, const vec3 & color)
+	// fadeaway 되는 위치
+	void fade_to(double x, double y)
 	{
-		my_canvas.beginTransformation();
-		my_canvas.translate(center_.x, center_.y);
-		my_canvas.rotate(sin(time*5.0) * 120.0);			// animation!
-		my_canvas.translate(0.04, -0.03);
-		my_canvas.scale(0.4, 0.1);
-		my_canvas.drawFilledBox(color, 0.18, 0.18);
-		my_canvas.endTransformation();
-	}
-
-	// 왼손 스윙
-	void actionLeft_1(const float & time, const vec3 & color)
-	{
-		my_canvas.beginTransformation();
-		my_canvas.translate(center_.x, center_.y);
-		my_canvas.rotate(sin(time*5.0) * 120.0);			// animation!
-		my_canvas.translate(0.03, -0.039);
-		my_canvas.scale(0.4, 0.1);
-		my_canvas.drawFilledBox(color, 0.18, 0.18);
-		my_canvas.translate(0.02, 0.0);
-		drawGun(time, RGBColors::blue);
-		my_canvas.endTransformation();
+		center_.x += x;
+		center_.y += y;
 	}
 
 	void draw(const float& time)
@@ -675,16 +718,8 @@ public:
 		{
 			drawHead(RGBColors::black);
 			drawBody(RGBColors::black);
-			if (player_)
-			{
-				if (my_canvas.isKeyPressed(GLFW_KEY_R)) actionLeft_1(time, RGBColors::black); else drawLeftArm(time, RGBColors::black);
-				if (my_canvas.isKeyPressed(GLFW_KEY_R)) actionRight_1(time, RGBColors::black); else drawRightArm(time, RGBColors::black);
-			}
-			else
-			{
-				if (my_canvas.isKeyPressed(GLFW_KEY_K)) actionLeft_1(time, RGBColors::black); else drawLeftArm(time, RGBColors::black);
-				if (my_canvas.isKeyPressed(GLFW_KEY_K)) actionRight_1(time, RGBColors::black); else drawRightArm(time, RGBColors::black);
-			}
+			drawLeftArm(time, RGBColors::black);
+			drawRightArm(time, RGBColors::black);
 			drawLeftLeg(time, RGBColors::black);
 			drawRightLeg(time, RGBColors::black);
 		}
@@ -761,20 +796,16 @@ int main(void)
 
 		warrior.keySettings();	// 키셋팅
 		gunner.keySettings();	// 키셋팅
-
-		if (warrior.dash_) { warrior.dash(); warrior.dash_ = false; }
-		else if ((int)time > 1000) warrior.dash_ = true;
-
-		// shoot a cannon ball
-		if (my_canvas.isKeyPressed(GLFW_KEY_SPACE))
+		
+		// shoot a bullet
+		if ((gunner.player_ && my_canvas.isKeyPressed(GLFW_KEY_T)) || (!gunner.player_ && my_canvas.isKeyPressed(GLFW_KEY_K)))
 		{
 			vec3 gp = gunner.gunPos_;
 			vec3 wc = warrior.center_;
 			if (gunner.player_)
-			{
 				wc.x = -wc.x;
-			}
-			if (is_close(gp, wc))	// 워리어와 근거리에 위치할 경우
+			else gp.x = -gp.x;
+			if (is_close(gp, wc) && !gunner.dead_)	// 워리어와 근거리에 위치할 경우
 			{
 				if (bullet != nullptr) { vec3 bc = bullet->center_; warrior.bleeding(bc, time); }	// 피 흘리는 모션
 				gunner.close_shot();	// 근거리 공격 후
@@ -856,6 +887,8 @@ int main(void)
 		if (warrior.hp_ <= 0) { warrior.dead_ = true; gunner.win(); }		// warrior 사망, gunner의 승리
 		if (gunner.hp_ <= 0) { gunner.dead_ = true; warrior.win(); }	// gunner사망, warrior의 승리
 		
+		warrior.dash(time);		// warrior가 dash 스킬을 사용할 수 있도록 설정
+		gunner.fadeaway(time);	// gunner가 fadeaway 스킬을 사용할 수 있도록 설정
 		time += 1 / 600.0;
 	}
 	);
