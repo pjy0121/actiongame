@@ -207,8 +207,6 @@ public:
 		{
 			render(draw_func);
 		}
-
-		glfwTerminate();
 	}
 
 	// 이미지 출력
@@ -248,13 +246,14 @@ public:
 		return pRaster;
 	}
 
-	void DoDisplay()
+	// 배경 출력
+	void DoDisplay(const char* path)
 	{
 		GLubyte *data;
 		int Width, Height;
 
 		glClear(GL_COLOR_BUFFER_BIT);
-		data = LoadBmp("2.bmp", &Width, &Height);
+		data = LoadBmp(path, &Width, &Height);
 
 		if (data != NULL) {
 			glRasterPos2f(-0.5, -0.5);

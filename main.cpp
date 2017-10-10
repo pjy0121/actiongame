@@ -2,9 +2,12 @@
 #include "RGBColors.h"
 #include <iostream>
 #include <cmath>
+#include <cstring>
+#include "gl.h"
 
 #define P1 true
 #define P2 false
+#define PERFORMANCE 2.0		// 배경에 따라 느려지는 현상이 발생해서 속도 조정
 
 using namespace std;
 using namespace glm;
@@ -13,7 +16,7 @@ DigitalCanvas2D my_canvas("This is my digital canvas!", 1024, 768); // Canvas : 
 int is_attacked(vec3& a, vec3& b, vec3* attackedPos);
 int is_attacked(vec3& a, vec3& b);
 int is_close(vec3& a, vec3& b);
-void menu();
+int menu();
 void guide();
 
 class Human
@@ -30,7 +33,7 @@ public:
 	
 
 	// 생성자
-	Human() : hp_(100), defense_(false), speed_(0.0006), dead_(false)
+	Human() : hp_(100), defense_(false), speed_(0.0006 * PERFORMANCE), dead_(false)
 	{}
 
 	// 게임 시작 시 초기 위치 지정
@@ -111,8 +114,8 @@ public:
 	// 피격 시 뒤로 밀림(넉백)
 	void knockback()
 	{
-		center_.x -= 0.002;
-		center_.y -= 0.002;
+		center_.x -= 0.002 * PERFORMANCE;
+		center_.y -= 0.002 * PERFORMANCE;
 	}
 
 	// 승자의 표식으로 왕관을 씌워줌
@@ -170,7 +173,7 @@ public:
 
 		timer += 1.0;
 
-		if (timer >= 3000)
+		if (timer >= 2000)
 			exit(0);
 	}
 
@@ -219,7 +222,7 @@ public:
 	{
 		my_canvas.beginTransformation();
 		my_canvas.translate(pos.x, pos.y);
-		my_canvas.rotate(sin(time*30.0) * 270);
+		my_canvas.rotate(sin(time*30.0* PERFORMANCE) * 270);
 		my_canvas.drawFilledCircle(RGBColors::red, 0.01, 10);
 		my_canvas.translate(-0.01, -0.01);
 		my_canvas.drawFilledCircle(RGBColors::red, 0.01, 10);
@@ -241,7 +244,7 @@ public:
 			my_canvas.scale(-1.0, 1.0);
 		}
 		my_canvas.translate(center_.x, center_.y + 0.2);
-		my_canvas.rotate(time * 90.0);
+		my_canvas.rotate(time * 90.0 * PERFORMANCE);
 		my_canvas.translate(-0.05, 0.0);
 		my_canvas.drawFilledCircle(color, 0.02, 100);
 		if (!player_)
@@ -290,7 +293,7 @@ public:
 	{
 		my_canvas.beginTransformation();
 		my_canvas.translate(center_.x-0.01, center_.y-0.12);
-		my_canvas.rotate(-30 + sin(time*7.0) * 60);
+		my_canvas.rotate(-30 + sin(time*7.0* PERFORMANCE) * 60);
 		my_canvas.drawFilledBox(RGBColors::black, 0.021, 0.03);
 		my_canvas.translate(0.0, -0.02);
 		my_canvas.drawFilledBox(RGBColors::black, 0.015, 0.07);
@@ -305,7 +308,7 @@ public:
 	{
 		my_canvas.beginTransformation();
 		my_canvas.translate(center_.x + 0.01, center_.y - 0.12);
-		my_canvas.rotate(-30 + sin(time*7.0) * -60);
+		my_canvas.rotate(-30 + sin(time*7.0* PERFORMANCE) * -60);
 		my_canvas.drawFilledBox(RGBColors::black, 0.021, 0.03);
 		my_canvas.translate(0.0, -0.02);
 		my_canvas.drawFilledBox(RGBColors::black, 0.015, 0.07);
@@ -346,7 +349,7 @@ public:
 	MyWarrior(bool _player) : dash_(true)
 	{
 		player_ = _player;
-		speed_ = 0.0009;
+		speed_ = 0.0009 * PERFORMANCE;
 		swordPos_ = center_;
 		
 		initPosition();	// 시작 위치 설정
@@ -438,7 +441,7 @@ public:
 				}
 			}
 		}		// ↓ dash의 쿨타임(재사용 대기 시간)을 5초로 두기 위함
-		else if ((int)time % 8 == 0 && 0 < time - (int)time && time - (int)time < 0.01) dash_ = true;
+		else if ((int)time % 5 == 0 && 0 < time - (int)time && time - (int)time < 0.01) dash_ = true;
 	}
 
 	// dash되는 위치
@@ -486,7 +489,7 @@ public:
 	{
 		my_canvas.beginTransformation();
 		my_canvas.translate(center_.x, center_.y);
-		my_canvas.rotate(-90 + pow(sin(time*7.0), 2) * 105.0);			// animation!
+		my_canvas.rotate(-90 + pow(sin(time*7.0* PERFORMANCE), 2) * 105.0);			// animation!
 		my_canvas.translate(0.04, -0.02);
 		my_canvas.scale(0.4, 0.1);
 		my_canvas.drawFilledBox(color, 0.18, 0.18);
@@ -498,7 +501,7 @@ public:
 	{
 		my_canvas.beginTransformation();
 		my_canvas.translate(center_.x, center_.y);
-		my_canvas.rotate(-90 + pow(sin(time*7.0), 2) * 105.0);			// animation!
+		my_canvas.rotate(-90 + pow(sin(time*7.0* PERFORMANCE), 2) * 105.0);			// animation!
 		my_canvas.translate(0.03, -0.025);
 		my_canvas.scale(0.4, 0.1);
 		my_canvas.drawFilledBox(color, 0.18, 0.18);
@@ -509,8 +512,8 @@ public:
 
 		double x = center_.x + 0.06;
 		double y = center_.y + 0.12;
-		swordPos_.x = x + pow(0.35*sin(time*8.0+90), 2);	// 스윙할 때 좌표 변화
-		swordPos_.y = y + pow(0.5*sin(time*8.0), 2) - 0.22;
+		swordPos_.x = x + pow(0.35*sin(time*8.0* PERFORMANCE +90), 2);	// 스윙할 때 좌표 변화
+		swordPos_.y = y + pow(0.5*sin(time*8.0* PERFORMANCE), 2) - 0.22;
 		// printf("%lf %lf\n", swordPos_.x, swordPos_.y);
 	}
 
@@ -753,7 +756,7 @@ public:
 				}
 			}
 		}		// ↓ fadeaway의 쿨타임(재사용 대기 시간)을 7초로 두기 위함
-		else if ((int)time % 7 == 0 && 0 < time - (int)time && time - (int)time < 0.01) fadeaway_ = true;
+		else if ((int)time % 7 == 0 && 0 < time - (int)time && time - (int)time < 0.1) fadeaway_ = true;
 	}
 
 	// fadeaway 되는 위치
@@ -809,7 +812,7 @@ public:
 	}
 };
 
-int main(void)
+int main(int argc, char** argv)
 {
 	float time = 0.0;
 
@@ -817,31 +820,41 @@ int main(void)
 	MyGunner gunner(P2);
 	MyBullet *bullet = nullptr;
 
-	/*
-	int bg = 0;	// 배경 번호
-	cout << "배경을 설정해주세요. (1) 숲 (2) 바다 (3) 땅\n --> " << endl;
-	cin >> bg;
-	*/
-
-	int select = 0;
-	menu();
-	cin >> select;
+	int select = 0;		// 캐릭터 설정 번호
+	char bg[1];	// 배경 번호
+	select = menu();
 
 	if (select == 2)	// 2번을 선택 시 warrior가 2P, gunner가 1P
 	{
 		warrior.player_ = false; gunner.player_ = true;
 	}
-	
+
+	/*
+	cout << "배경을 선택해주세요.\n (1) 숲 (2) 바다 (3) 땅\n --> " << endl;
+	cin >> bg;
+
+	char* file_name = strcat(bg, ".bmp");
+	*/
+
 	my_canvas.show([&]
 	{
-	/*
-		 // 배경 설정
+		my_canvas.beginTransformation();
+		my_canvas.translate(-1.35, -1.0);
+		my_canvas.scale(0.008, 0.008);
+		view_Display();
+		my_canvas.scale(125, 125);
+		my_canvas.translate(1.5, 1.0);
+		my_canvas.endTransformation();
+
+		/*
+		// 배경 이미지 설정
 		my_canvas.beginTransformation();
 		my_canvas.translate(-0.83, -0.5);
-		my_canvas.DoDisplay();
+		my_canvas.DoDisplay(file_name);
 		my_canvas.translate(0.83, 0.5);
 		my_canvas.endTransformation();
-	*/
+		*/
+
 		warrior.keySettings();	// 키셋팅
 		gunner.keySettings();	// 키셋팅
 		
@@ -885,8 +898,8 @@ int main(void)
 		if (bullet != nullptr)
 		{
 			if(gunner.player_)
-				bullet->update(1 / 95.0f);
-			else bullet->update(-1 / 95.0f);
+				bullet->update(1 / 80.0f);
+			else bullet->update(-1 / 80.0f);
 		}
 
 		// rendering
@@ -901,7 +914,7 @@ int main(void)
 		{
 			vec3 wc = warrior.center_;
 
-			if (!warrior.player_) wc.x = -wc.x; // warrir가 2P일 경우
+			if (!warrior.player_) wc.x = -wc.x; // warrior가 2P일 경우
 			
 			// gunner의 공격에 warrior가 피격
 			if (is_attacked(wc, bullet->center_, attackedPos))
@@ -947,15 +960,15 @@ int main(void)
 		
 		warrior.dash(time);		// warrior가 dash 스킬을 사용할 수 있도록 설정
 		gunner.fadeaway(time);	// gunner가 fadeaway 스킬을 사용할 수 있도록 설정
-		time += 1 / 600.0;
+		time += 1 / 150.0;
 	}
 	);
 	return 0;
 }
 
-void menu()
+int menu()
 {
-	int menu_select = 0;
+	int menu_select = 0, character_select = 0;
 	cout << "(1) 게임 시작하기\t (2) 게임 가이드 보기" << endl;
 	cout << ": ";
 	cin >> menu_select;
@@ -972,6 +985,9 @@ void menu()
 	cout << "1P - 워리어 \t 1P - 거너" << endl;
 	cout << "2P - 거너 \t 2P - 워리어" << endl;
 	cout << ": ";
+	cin >> character_select;
+
+	return character_select;
 }
 
 void guide()
@@ -1000,7 +1016,7 @@ void guide()
 
 	cout << "캐릭터 위에 구슬이 돌고 있다면 특수 스킬 발동이 가능합니다." << endl;
 	cout << "ㅁ 워리어의 특수 스킬(쿨타임 5초)\n- 대쉬(Dash) : 방향키와 함께 사용하여 해당 방향으로 빠르게 이동합니다." << endl;
-	cout << "ㅁ 거너의 특수 스킬(쿨타임 7초)\n- 페이드어웨이(Fade-away) : 위키 혹은 아래 키와 함께 사용하여 해당 방향 뒤쪽으로 멀리 도망칩니다.\n" << endl;
+	cout << "ㅁ 거너의 특수 스킬(쿨타임 7초)\n- 페이드어웨이(Fade-away) : 위 키 혹은 아래 키와 함께 사용하여 해당 방향 뒤쪽으로 멀리 도망칩니다.\n" << endl;
 }
 
 // 두 점의 좌표가 같은 지 판단하기(피격여부 판단)
