@@ -40,3 +40,7 @@ x64/Release/PixelDrawing.iobj
 x64/Release/PixelDrawing.exe
 x64/Release/DigitalCanvas2D.obj
 PixelDrawing.VC.VC.opendb
+x64/Debug/MyBullet.obj
+x64/Debug/MyGunner.obj
+x64/Debug/MyWarrior.obj
+x64/Debug/MyHuman.obj

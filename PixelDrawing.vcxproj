@@ -147,6 +147,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DigitalCanvas2D.h" />
+    <ClInclude Include="MyBullet.h" />
+    <ClInclude Include="MyGunner.h" />
+    <ClInclude Include="MyHuman.h" />
+    <ClInclude Include="MyWarrior.h" />
     <ClInclude Include="RGBColors.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
